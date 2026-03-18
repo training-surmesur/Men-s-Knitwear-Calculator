@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SURMESUR - Knitwear Calculator</title>
+<style>
+:root { --black:#1D1D1B; --gray:#605F60; --pale:#DDDDDE; --tea:#D7D6D0; --white:#FFFFFF; --border:#C8C7C1; }
+* { box-sizing:border-box; margin:0; padding:0; }
+body { font-family:Helvetica,Arial,sans-serif; background:var(--tea); color:var(--black); }
+header { background:var(--black); padding:1.5rem 2rem; display:flex; align-items:center; justify-content:space-between; }
+.htag { font-size:10px; letter-spacing:.15em; text-transform:uppercase; color:var(--pale); }
+.wrap { max-width:640px; margin:0 auto; padding:2.5rem 1.5rem 5rem; }
+.pg-header { margin-bottom:2.5rem; padding-bottom:1.5rem; border-bottom:1px solid var(--border); }
+.pg-label { font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:var(--gray); margin-bottom:.5rem; }
+.pg-title { font-size:1.6rem; font-weight:700; letter-spacing:.05em; text-transform:uppercase; line-height:1.2; }
+.sec { margin-bottom:2rem; }
+.sec-label { font-size:10px; letter-spacing:.18em; text-transform:uppercase; color:var(--gray); margin-bottom:.75rem; display:block; }
+.btn-group { display:grid; gap:1px; background:var(--border); border:1px solid var(--border); }
+.g3 { grid-template-columns:1fr 1fr 1fr; }
+.g2 { grid-template-columns:1fr 1fr; }
+.opt { background:var(--white); border:none; padding:14px 16px; font-family:Helvetica,Arial,sans-serif; font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--gray); cursor:pointer; text-align:left; line-height:1.5; }
+.opt:hover { background:var(--pale); color:var(--black); }
+.opt.on { background:var(--black); color:var(--white); }
+.opt small { display:block; font-size:10px; margin-top:2px; opacity:.6; }
+.sel { width:100%; padding:12px 14px; border:1px solid var(--border); background:var(--white); font-family:Helvetica,Arial,sans-serif; font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--black); appearance:none; cursor:pointer; }
+.meas-grid { display:grid; grid-template-columns:1fr 1fr; gap:1px; background:var(--border); border:1px solid var(--border); }
+.mfield { background:var(--white); padding:12px 14px; display:flex; flex-direction:column; gap:6px; }
+.mfield label { font-size:9px; letter-spacing:.15em; text-transform:uppercase; color:var(--gray); }
+.mwrap { position:relative; }
+.minput { width:100%; padding:6px 32px 6px 0; border:none; border-bottom:1px solid var(--border); background:transparent; font-family:Helvetica,Arial,sans-serif; font-size:16px; color:var(--black); }
+.minput:focus { outline:none; border-bottom-color:var(--black); }
+.minput::placeholder { color:var(--pale); }
+.munit { position:absolute; right:0; top:50%; transform:translateY(-50%); font-size:10px; color:var(--gray); pointer-events:none; }
+.tbtn { background:none; border:none; font-family:Helvetica,Arial,sans-serif; font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:var(--gray); cursor:pointer; padding:8px 0; text-decoration:underline; margin-top:8px; display:block; }
+.cbtn { width:100%; padding:18px; background:var(--black); color:var(--white); border:none; font-family:Helvetica,Arial,sans-serif; font-size:11px; font-weight:700; letter-spacing:.2em; text-transform:uppercase; cursor:pointer; margin-top:.5rem; }
+.cbtn:hover { background:var(--gray); }
+.rbox { margin-top:2rem; border:1px solid var(--border); display:none; }
+.rhead { background:var(--black); padding:1.25rem 1.5rem; display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; }
+.rtitle { font-size:11px; font-weight:700; letter-spacing:.18em; text-transform:uppercase; color:var(--white); }
+.rmeta { font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--pale); margin-top:4px; opacity:.7; }
+.stag { background:var(--white); color:var(--black); font-size:10px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; padding:5px 12px; white-space:nowrap; flex-shrink:0; }
+.rrow { display:flex; align-items:center; justify-content:space-between; padding:14px 1.5rem; border-bottom:1px solid var(--pale); background:var(--white); }
+.rrow:last-of-type { border-bottom:none; }
+.rlabel { font-size:10px; letter-spacing:.14em; text-transform:uppercase; color:var(--gray); }
+.rval { font-size:1.1rem; font-weight:700; color:var(--black); }
+.rnote { padding:14px 1.5rem; background:var(--tea); border-top:1px solid var(--border); font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--gray); line-height:1.8; }
+.rnote b { color:var(--black); }
+.resetbtn { width:100%; padding:14px; background:transparent; color:var(--gray); border:none; border-top:1px solid var(--border); font-family:Helvetica,Arial,sans-serif; font-size:10px; letter-spacing:.15em; text-transform:uppercase; cursor:pointer; }
+.resetbtn:hover { background:var(--pale); color:var(--black); }
+footer { text-align:center; padding:2rem; font-size:9px; letter-spacing:.15em; text-transform:uppercase; color:var(--gray); border-top:1px solid var(--border); margin-top:4rem; }
+@media(max-width:480px) { .g3 { grid-template-columns:1fr; } .meas-grid { grid-template-columns:1fr; } .wrap { padding:1.5rem 1rem 3rem; } }
+</style>
+</head>
+<body>
+
+<header>
+  <img src="logo.png" alt="Surmesur" style="height:22px;width:auto;">
+  <span class="htag">Knitwear Calculator</span>
+</header>
+
+<div class="wrap">
+  <div class="pg-header">
+    <div class="pg-label">Internal tool</div>
+    <div class="pg-title">Knitwear<br>Measurement<br>Calculator</div>
+  </div>
+
+  <div class="sec">
+    <span class="sec-label">01 - Fabric type</span>
+    <div class="btn-group g3" id="fabricGroup">
+      <button class="opt on" data-group="fabric" data-val="wool">Thin wool<small>100% wool</small></button>
+      <button class="opt" data-group="fabric" data-val="cashM">Medium cashmere<small>100% cashmere</small></button>
+      <button class="opt" data-group="fabric" data-val="cashH">Heavy cashmere<small>100% cashmere</small></button>
+    </div>
+  </div>
+
+  <div class="sec">
+    <span class="sec-label">02 - Style</span>
+    <select class="sel" id="styleSelect">
+      <option value="formal">Round Neck (UDM03) - Formal</option>
+      <option value="formal">V-Neck (UDM04) - Formal</option>
+      <option value="formal">High Collar (UDM05) - Formal</option>
+      <option value="formal">Turtleneck (UDM06) - Formal</option>
+      <option value="casual">Cardigan (UDM07) - Casual</option>
+      <option value="casual">Zip-up (UDM08) - Casual</option>
+      <option value="casual">Hooded Zip-up (UDM09) - Casual</option>
+      <option value="formal">Polo (UDM10) - Formal</option>
+      <option value="casual">Zip-up Collar (UDM11) - Casual</option>
+      <option value="casual">Hoodie (UDM12) - Casual</option>
+      <option value="casual">Shawl Collar Cardigan (UDM13) - Casual</option>
+    </select>
+  </div>
+
+  <div class="sec">
+    <span class="sec-label">03 - Fit preference</span>
+    <div class="btn-group g3" id="fitGroup">
+      <button class="opt" data-group="fit" data-val="fitted">Fitted<small>On skin</small></button>
+      <button class="opt on" data-group="fit" data-val="regular">Regular<small>Over a shirt</small></button>
+      <button class="opt" data-group="fit" data-val="relaxed">Relaxed<small>Oversized feel</small></button>
+    </div>
+  </div>
+
+  <div class="sec">
+    <span class="sec-label">04 - Body type</span>
+    <div class="btn-group g2" id="bodyGroup">
+      <button class="opt on" data-group="body" data-val="H">H shape<small>Average build</small></button>
+      <button class="opt" data-group="body" data-val="Y">Y shape<small>Athletic, lean</small></button>
+      <button class="opt" data-group="body" data-val="X">X shape<small>Large and muscular</small></button>
+      <button class="opt" data-group="body" data-val="O">O shape<small>Round stomach / pear</small></button>
+    </div>
+  </div>
+
+  <div class="sec">
+    <span class="sec-label">05 - Client height</span>
+    <select class="sel" id="heightSelect">
+      <option value="23.5">5ft 2in</option>
+      <option value="24">5ft 3in</option>
+      <option value="24.5">5ft 4in</option>
+      <option value="25">5ft 5in</option>
+      <option value="25.5">5ft 6in</option>
+      <option value="26">5ft 7in</option>
+      <option value="26.5">5ft 8in</option>
+      <option value="27">5ft 9in</option>
+      <option value="27.5">5ft 10in</option>
+      <option value="28">5ft 11in</option>
+      <option value="28.5">6ft 0in</option>
+      <option value="29">6ft 1in</option>
+      <option value="29.5">6ft 2in</option>
+      <option value="30">6ft 3in</option>
+      <option value="30.5">6ft 4in</option>
+      <option value="31">6ft 5in</option>
+      <option value="31.5">6ft 6in</option>
+      <option value="32">6ft 7in</option>
+      <option value="32.5">6ft 8in</option>
+      <option value="33">6ft 9in</option>
+      <option value="33.5">6ft 10in</option>
+      <option value="34">6ft 11in</option>
+      <option value="34.5">7ft 0in</option>
+    </select>
+  </div>
+
+  <div class="sec">
+    <span class="sec-label">06 - Body measurements (inches)</span>
+    <div class="meas-grid">
+      <div class="mfield"><label>Chest (skin)</label><div class="mwrap"><input class="minput" type="number" id="chest" placeholder="00.00" step="0.25"><span class="munit">in</span></div></div>
+      <div class="mfield"><label>Seat / hips (skin)</label><div class="mwrap"><input class="minput" type="number" id="seat" placeholder="00.00" step="0.25"><span class="munit">in</span></div></div>
+      <div class="mfield"><label>Bicep (skin)</label><div class="mwrap"><input class="minput" type="number" id="bicep" placeholder="00.00" step="0.25"><span class="munit">in</span></div></div>
+      <div class="mfield"><label>Wrist (skin)</label><div class="mwrap"><input class="minput" type="number" id="wrist" placeholder="00.00" step="0.25"><span class="munit">in</span></div></div>
+      <div class="mfield"><label>Shirt shoulders</label><div class="mwrap"><input class="minput" type="number" id="shoulders" placeholder="00.00" step="0.25"><span class="munit">in</span></div></div>
+      <div class="mfield"><label>Shirt sleeve length</label><div class="mwrap"><input class="minput" type="number" id="sleeve" placeholder="00.00" step="0.25"><span class="munit">in</span></div></div>
+      <div class="mfield" id="waistField" style="display:none;"><label>Waist (skin)</label><div class="mwrap"><input class="minput" type="number" id="waist" placeholder="00.00" step="0.25"><span class="munit">in</span></div></div>
+    </div>
+    <button class="tbtn" id="waistBtn">+ Add waist measurement</button>
+  </div>
+
+  <button class="cbtn" id="calcBtn">Calculate Studio Measurements</button>
+
+  <div class="rbox" id="results">
+    <div class="rhead">
+      <div>
+        <div class="rtitle">Studio measurements</div>
+        <div class="rmeta" id="rmeta"></div>
+      </div>
+      <div class="stag" id="stag"></div>
+    </div>
+    <div id="rrows"></div>
+    <div class="rnote" id="rnote"></div>
+    <button class="resetbtn" id="resetBtn">Clear and start over</button>
+  </div>
+</div>
+
+<footer>Surmesur &middot; Internal use only &middot; Knitwear v1.1</footer>
+
+<script>
+var state = {fabric:"wool", fit:"regular", body:"H"};
+var waistOn = false;
+
+var sizes = [{s:"XS",c:37},{s:"S",c:39},{s:"M",c:41},{s:"L",c:44},{s:"XL",c:47},{s:"XXL",c:50},{s:"XXXL",c:54}];
+
+function getSize(v) {
+  var r = sizes[0];
+  for (var i=0;i<sizes.length;i++) { if (Math.abs(v-sizes[i].c) < Math.abs(v-r.c)) r=sizes[i]; }
+  return r.s;
+}
+
+function fmt(n) { return (Math.round(n*4)/4).toFixed(2); }
+
+function fabExtra() {
+  if (state.fabric=="cashM") return {chest:0.5,hem:0.5,sh:0,bi:0.5,cu:0,sl:0};
+  if (state.fabric=="cashH") return {chest:1,hem:0.5,sh:0.25,bi:0.5,cu:0.25,sl:0};
+  return {chest:0,hem:0,sh:0,bi:0,cu:0,sl:0};
+}
+
+function fitEase() {
+  if (state.fit=="fitted")  return {chest:1.5,hem:0.5,sh:0,bi:1,cu:1,sl:0};
+  if (state.fit=="relaxed") return {chest:4,hem:2.5,sh:0.5,bi:2.5,cu:1,sl:0};
+  return {chest:3,hem:1.5,sh:0.25,bi:1.5,cu:1,sl:-0.5};
+}
+
+function bodyAdj() {
+  var rel = state.fit=="relaxed";
+  if (state.body=="X") return {chest:0.5,hem:0.5,bi:rel?0:1,len:0};
+  if (state.body=="O") return {chest:0.5,hem:1,bi:0,len:0.5};
+  return {chest:0,hem:0,bi:0,len:0};
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+
+  document.querySelectorAll(".opt").forEach(function(btn) {
+    btn.addEventListener("click", function() {
+      var grp = this.getAttribute("data-group");
+      var val = this.getAttribute("data-val");
+      state[grp] = val;
+      var parent = this.parentElement;
+      parent.querySelectorAll(".opt").forEach(function(b) { b.classList.remove("on"); });
+      this.classList.add("on");
+      if (grp=="body") {
+        if (val=="O") {
+          document.getElementById("waistField").style.display = "block";
+          document.getElementById("waistBtn").style.display = "none";
+          waistOn = true;
+        } else {
+          document.getElementById("waistField").style.display = "none";
+          document.getElementById("waistBtn").style.display = "block";
+          document.getElementById("waistBtn").textContent = "+ Add waist measurement";
+          document.getElementById("waist").value = "";
+          waistOn = false;
+        }
+      }
+    });
+  });
+
+  document.getElementById("waistBtn").addEventListener("click", function() {
+    waistOn = !waistOn;
+    document.getElementById("waistField").style.display = waistOn ? "block" : "none";
+    this.textContent = waistOn ? "- Remove waist measurement" : "+ Add waist measurement";
+    if (!waistOn) document.getElementById("waist").value = "";
+  });
+
+  document.getElementById("calcBtn").addEventListener("click", function() {
+    var chest = parseFloat(document.getElementById("chest").value);
+    var seat = parseFloat(document.getElementById("seat").value);
+    var bicep = parseFloat(document.getElementById("bicep").value);
+    var wrist = parseFloat(document.getElementById("wrist").value);
+    var sh = parseFloat(document.getElementById("shoulders").value);
+    var sl = parseFloat(document.getElementById("sleeve").value);
+    var wv = document.getElementById("waist").value;
+    var waist = wv ? parseFloat(wv) : null;
+    var minLen = parseFloat(document.getElementById("heightSelect").value);
+    var styleEl = document.getElementById("styleSelect");
+    var isFormal = styleEl.options[styleEl.selectedIndex].value == "formal";
+
+    if (isNaN(chest)||isNaN(seat)||isNaN(bicep)||isNaN(wrist)||isNaN(sh)||isNaN(sl)) {
+      alert("Please fill in all six body measurements.");
+      return;
+    }
+
+    var fe = fitEase();
+    var fx = fabExtra();
+    var fb = bodyAdj();
+
+    var chestOut = chest + fe.chest + fx.chest + fb.chest;
+    var hemOut   = seat  + fe.hem   + fx.hem   + fb.hem;
+    var shOut    = sh    + fe.sh    + fx.sh;
+    var slOut    = sl    + fe.sl    + fx.sl;
+    var biOut    = bicep + fe.bi    + fx.bi    + fb.bi;
+    var cuOut    = wrist + fe.cu    + fx.cu;
+    var lenMin   = fmt(minLen + fb.len);
+    var sz       = getSize(chestOut);
+
+    var warn = "";
+    if (waist) {
+      var wf = waist + 2;
+      if (hemOut < wf) {
+        var oh = hemOut; hemOut = wf;
+        warn += " HEM ADJUSTED FROM " + fmt(oh) + "in TO " + fmt(hemOut) + "in TO CLEAR WAIST.";
+      }
+      if (chestOut < wf) {
+        warn += " NOTE: CHEST (" + fmt(chestOut) + "in) IS NARROWER THAN WAIST (" + fmt(wf) + "in) - REVIEW WITH STYLIST.";
+      }
+    }
+
+    var fabLbl = {wool:"Thin wool",cashM:"Medium cashmere",cashH:"Heavy cashmere"}[state.fabric];
+    var fitLbl = {fitted:"Fitted",regular:"Regular",relaxed:"Relaxed"}[state.fit];
+    var bdyLbl = {H:"H shape",Y:"Y shape",X:"X shape",O:"O shape"}[state.body];
+    var stLbl  = styleEl.options[styleEl.selectedIndex].text.split(" -")[0];
+
+    document.getElementById("rmeta").textContent = fitLbl+" - "+fabLbl+" - "+bdyLbl+" - "+stLbl;
+    document.getElementById("stag").textContent  = "Size ref: "+sz;
+
+    var rows = [
+      {l:"Chest",v:fmt(chestOut)},
+      {l:"Bottom hem",v:fmt(hemOut)},
+      {l:"Length",v:lenMin},
+      {l:"Shoulders",v:fmt(shOut)},
+      {l:"Sleeve length",v:fmt(slOut)},
+      {l:"Bicep",v:fmt(biOut)},
+      {l:"Cuff",v:fmt(cuOut)}
+    ];
+
+    var html = "";
+    for (var i=0;i<rows.length;i++) {
+      html += '<div class="rrow"><span class="rlabel">'+rows[i].l+'</span><span class="rval">'+rows[i].v+'"</span></div>';
+    }
+    document.getElementById("rrows").innerHTML = html;
+
+    var hv = parseFloat(document.getElementById("heightSelect").value);
+    var tallW = hv >= 31.5 ? " CLIENT ABOVE 6FT 5IN - VERIFY TORSO LENGTH VISUALLY." : "";
+    var lenCtx = isFormal
+      ? "FORMAL STYLE: ADJUST UP BASED ON CLIENT PREFERENCE."
+      : "CASUAL STYLE: LENGTH IS STYLIST AND CLIENT PREFERENCE.";
+
+    var noteText = lenCtx + tallW + warn;
+    document.getElementById("rnote").textContent = noteText;
+    document.getElementById("results").style.display = "block";
+    document.getElementById("results").scrollIntoView({behavior:"smooth",block:"nearest"});
+  });
+
+  document.getElementById("resetBtn").addEventListener("click", function() {
+    ["chest","seat","bicep","wrist","shoulders","sleeve","waist"].forEach(function(id) {
+      document.getElementById(id).value = "";
+    });
+    document.getElementById("results").style.display = "none";
+    document.getElementById("waistField").style.display = "none";
+    document.getElementById("waistBtn").style.display = "block";
+    document.getElementById("waistBtn").textContent = "+ Add waist measurement";
+    waistOn = false;
+    window.scrollTo({top:0,behavior:"smooth"});
+  });
+
+});
+</script>
+</body>
+</html>
